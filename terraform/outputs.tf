@@ -17,3 +17,18 @@ output "ecr_repository_url" {
   description = "ECR repository URL for the app image."
   value       = module.ecr.repository_url
 }
+
+output "cluster_name" {
+  description = "Name of the EKS cluster."
+  value       = module.eks.cluster_name
+}
+
+output "cluster_endpoint" {
+  description = "Kubernetes API server endpoint."
+  value       = module.eks.cluster_endpoint
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "IRSA role ARN for the Cluster Autoscaler (used in k8s phase)."
+  value       = module.eks.cluster_autoscaler_role_arn
+}

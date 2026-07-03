@@ -16,3 +16,17 @@ module "ecr" {
 
   name_prefix = local.name_prefix
 }
+
+module "eks" {
+  source = "./modules/eks"
+
+  name_prefix            = local.name_prefix
+  cluster_version        = var.cluster_version
+  subnet_ids             = module.vpc.private_subnet_ids
+  node_instance_types    = var.node_instance_types
+  node_desired_size      = var.node_desired_size
+  node_min_size          = var.node_min_size
+  node_max_size          = var.node_max_size
+  endpoint_public_access = var.eks_endpoint_public_access
+  public_access_cidrs    = var.eks_public_access_cidrs
+}
