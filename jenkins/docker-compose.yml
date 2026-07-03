@@ -1,0 +1,17 @@
+# Local Jenkins for demoing the pipeline. Mounts the host Docker socket so the
+# Build stage can build images (Docker-out-of-Docker). The agent also needs the
+# aws, kubectl, and kustomize CLIs — see README.md for the tools an agent requires.
+services:
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    user: root
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:

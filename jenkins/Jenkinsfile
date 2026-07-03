@@ -1,0 +1,108 @@
+// CI/CD for Max Weather: build the image, test it, push to ECR, deploy to staging,
+// then (after manual approval) promote the same image to production. One image is
+// built once and promoted — staging and prod run the identical artifact.
+pipeline {
+  agent any
+
+  parameters {
+    string(name: 'AWS_REGION', defaultValue: 'ap-southeast-1', description: 'AWS region')
+    string(name: 'ECR_REPO', defaultValue: '', description: 'ECR repository URL: terraform output -raw ecr_repository_url')
+    string(name: 'CLUSTER_NAME', defaultValue: 'maxweather-prod-eks', description: 'EKS cluster name')
+  }
+
+  environment {
+    AWS_REGION   = "${params.AWS_REGION}"
+    ECR_REPO     = "${params.ECR_REPO}"
+    CLUSTER_NAME = "${params.CLUSTER_NAME}"
+  }
+
+  options {
+    disableConcurrentBuilds()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+        // Immutable, traceable tag: the short commit SHA.
+        script {
+          env.IMAGE_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+        }
+      }
+    }
+
+    stage('Build & test image') {
+      steps {
+        sh '''
+          docker build -t "$ECR_REPO:$IMAGE_TAG" app/
+          # Smoke-test the built image before it can be pushed or deployed.
+          docker rm -f mw-ci-test 2>/dev/null || true
+          docker run -d --name mw-ci-test -p 8081:8080 "$ECR_REPO:$IMAGE_TAG"
+          for i in $(seq 1 15); do
+            curl -fsS localhost:8081/health && break || sleep 1
+          done
+          curl -fsS localhost:8081/health
+          docker rm -f mw-ci-test
+        '''
+      }
+    }
+
+    stage('Push to ECR') {
+      steps {
+        sh '''
+          aws ecr get-login-password --region "$AWS_REGION" \
+            | docker login --username AWS --password-stdin "${ECR_REPO%/*}"
+          docker push "$ECR_REPO:$IMAGE_TAG"
+        '''
+      }
+    }
+
+    stage('Deploy to staging') {
+      steps {
+        sh '''
+          aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION"
+          cd k8s/overlays/staging
+          kustomize edit set image maxweather-app="$ECR_REPO:$IMAGE_TAG"
+          kubectl apply -k .
+          kubectl -n staging rollout status deploy/maxweather --timeout=180s
+        '''
+      }
+    }
+
+    stage('Verify staging') {
+      steps {
+        sh 'kubectl -n staging get pods -l app=maxweather -o wide'
+      }
+    }
+
+    stage('Approve production') {
+      steps {
+        input message: "Promote ${env.IMAGE_TAG} to production?", ok: 'Deploy'
+      }
+    }
+
+    stage('Deploy to production') {
+      steps {
+        sh '''
+          cd k8s/overlays/prod
+          kustomize edit set image maxweather-app="$ECR_REPO:$IMAGE_TAG"
+          kubectl apply -k .
+          kubectl -n prod rollout status deploy/maxweather --timeout=180s
+        '''
+      }
+    }
+
+    stage('Verify production') {
+      steps {
+        sh 'kubectl -n prod get pods -l app=maxweather -o wide'
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker rm -f mw-ci-test 2>/dev/null || true'
+    }
+  }
+}
