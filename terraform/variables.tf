@@ -73,3 +73,9 @@ variable "eks_public_access_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "api_backend_url" {
+  description = "URL the API Gateway proxies to — the Nginx Ingress NLB. Set after the cluster + ingress are up (phase 8)."
+  type        = string
+  default     = ""
+}

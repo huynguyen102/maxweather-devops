@@ -46,3 +46,12 @@ module "lambda_authorizer" {
   audience       = module.cognito.client_id
   required_scope = module.cognito.scope
 }
+
+module "api_gateway" {
+  source = "./modules/api-gateway"
+
+  name_prefix              = local.name_prefix
+  authorizer_invoke_arn    = module.lambda_authorizer.invoke_arn
+  authorizer_function_name = module.lambda_authorizer.function_name
+  backend_url              = var.api_backend_url
+}

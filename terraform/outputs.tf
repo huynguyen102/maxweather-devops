@@ -52,3 +52,8 @@ output "cognito_issuer" {
   description = "JWT issuer URL (for the Lambda authorizer)."
   value       = module.cognito.issuer
 }
+
+output "api_endpoint" {
+  description = "Base invoke URL of the API Gateway."
+  value       = module.api_gateway.api_endpoint
+}
