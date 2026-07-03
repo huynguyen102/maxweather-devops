@@ -30,6 +30,16 @@ Huy Nguyen (huy.devops.engineer@gmail.com) — Senior DevOps / SRE, ~6 years acr
 
 Language: Vietnamese for back-and-forth discussion; English for anything committed or shared (repo files, docs, commits).
 
+## Phase review — so the author can present the work
+At the end of each build phase, before committing, walk the output as if preparing to **defend it in a review meeting** — this is a teaching walkthrough, not a checklist gate. Five blocks, delivered one at a time; the author interrupts to question or push back:
+1. **What it is & which requirement it solves** — plain terms; explain any unfamiliar concept with an example first.
+2. **How it works** — the flow in enough detail to redraw on a whiteboard (who calls whom, where traffic goes).
+3. **Why this, not the alternative** — the decision and the rejected option; this is where reviewers dig hardest.
+4. **"If asked X, answer Y"** — the 3-4 most likely questions with crisp, in-the-author's-voice answers.
+5. **Where in the repo** — files/lines to point at during a live demo.
+
+The phase is "understood" when the author can restate it unaided — only then commit + update TRACKER. Talking points live in their natural home: ADRs (why / alternatives), `architecture.md` (flow), module READMEs (config). If the review surfaces a point not yet captured, add it to the relevant ADR (one home per fact). Convention checks (naming, tagging, module anatomy, no secrets) are done silently and raised only when something is off.
+
 ## Environment
 Commands assume macOS / zsh with `aws`, `kubectl`, `terraform`, `docker`, and `terraform-docs` installed and AWS credentials configured. Don't emit syntax for a shell that isn't in use.
 

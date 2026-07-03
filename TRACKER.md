@@ -4,6 +4,9 @@ Plan of record cho bài DevOps Technical Assessment (101 Digital). Mỗi phase l
 
 Status: `[ ]` chưa · `[~]` đang làm · `[x]` xong
 
+## Phase Review Gate (cuối mỗi phase, trước khi commit)
+Review = walkthrough để tác giả **trình bày lại được trong meeting**, không phải checklist. 5 khối: (1) cái gì & giải requirement nào · (2) cách nó chạy (vẽ được whiteboard) · (3) vì sao chọn cách này, không chọn cách kia · (4) "nếu bị hỏi X trả lời Y" · (5) chỉ vào file/dòng trong repo. Tác giả nói lại được → mới commit + tick TRACKER. Đạn trình bày nằm ở ADR / architecture.md / module README; review lòi point mới thì bổ sung vào ADR. Chi tiết: [CLAUDE.md](CLAUDE.md#phase-review--so-the-author-can-present-the-work).
+
 ---
 
 ## Nguyên tắc vận hành
