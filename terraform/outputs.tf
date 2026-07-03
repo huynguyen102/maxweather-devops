@@ -12,3 +12,8 @@ output "private_subnet_ids" {
   description = "IDs of the private (node/pod) subnets."
   value       = module.vpc.private_subnet_ids
 }
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for the app image."
+  value       = module.ecr.repository_url
+}

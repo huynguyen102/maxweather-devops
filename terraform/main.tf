@@ -10,3 +10,9 @@ module "vpc" {
   az_count           = var.az_count
   single_nat_gateway = var.single_nat_gateway
 }
+
+module "ecr" {
+  source = "./modules/ecr"
+
+  name_prefix = local.name_prefix
+}
