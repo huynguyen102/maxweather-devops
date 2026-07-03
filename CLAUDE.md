@@ -30,8 +30,14 @@ Huy Nguyen (huy.devops.engineer@gmail.com) — Senior DevOps / SRE, ~6 years acr
 
 Language: Vietnamese for back-and-forth discussion; English for anything committed or shared (repo files, docs, commits).
 
-## Phase review — so the author can present the work
-At the end of each build phase, before committing, walk the output as if preparing to **defend it in a review meeting** — this is a teaching walkthrough, not a checklist gate. Five blocks, delivered one at a time; the author interrupts to question or push back:
+## Phase review — so the author can defend the work
+The delivery package (repo + docs) is read by the reviewer on its own; the meeting is **questions, not a presentation**. So the review has two aims: (1) the package stands alone — readable without a walkthrough — and (2) the author can answer any question a reviewer might drill into. At the end of each build phase, before committing, walk the output as a teaching session toward those aims — not a checklist gate, and not a rehearsed talk.
+
+**Altitude — this is a DevOps/SRE review, not a code review.** Explain at the level of control plane vs data plane, architecture, request/data flow, failure modes, scaling, delivery (CI/CD, IaC), and observability. Do NOT walk code internals (syntax, per-line logic, library choices) unless the author explicitly asks — the author reasons about systems, not source.
+
+**Order** — the review replays the order the project was built, top-down: problem & goals → way of working (AI-assisted discipline) → architecture (control/data plane, flow) → DevOps (IaC, CI/CD) → SRE (HA, scaling, observability, failure modes).
+
+Five blocks, delivered one at a time; the author interrupts to question or push back:
 1. **What it is & which requirement it solves** — plain terms; explain any unfamiliar concept with an example first.
 2. **How it works** — the flow in enough detail to redraw on a whiteboard (who calls whom, where traffic goes).
 3. **Why this, not the alternative** — the decision and the rejected option; this is where reviewers dig hardest.
