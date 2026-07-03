@@ -36,3 +36,13 @@ module "cognito" {
 
   name_prefix = local.name_prefix
 }
+
+module "lambda_authorizer" {
+  source = "./modules/lambda-authorizer"
+
+  name_prefix    = local.name_prefix
+  issuer         = module.cognito.issuer
+  jwks_uri       = module.cognito.jwks_uri
+  audience       = module.cognito.client_id
+  required_scope = module.cognito.scope
+}

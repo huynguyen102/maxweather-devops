@@ -11,6 +11,9 @@ override.tf.json
 tfplan
 *.tfplan
 
+# Lambda build artifacts (zipped at plan time)
+terraform/modules/*/*.zip
+
 # Secrets — never commit
 *.secret.tfvars
 *.auto.tfvars
