@@ -30,3 +30,9 @@ module "eks" {
   endpoint_public_access = var.eks_endpoint_public_access
   public_access_cidrs    = var.eks_public_access_cidrs
 }
+
+module "cognito" {
+  source = "./modules/cognito"
+
+  name_prefix = local.name_prefix
+}
