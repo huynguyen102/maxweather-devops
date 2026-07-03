@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: maxweather
+  labels:
+    app: maxweather
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: maxweather
+  template:
+    metadata:
+      labels:
+        app: maxweather
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          # Placeholder image name; each overlay's `images:` maps it to the real
+          # ECR repository and tag (see overlays/*/kustomization.yaml).
+          image: maxweather-app
+          ports:
+            - containerPort: 8080
+          # Requests let the scheduler place pods and give the HPA a CPU baseline
+          # to compute utilisation against; limits cap a noisy pod.
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      # gunicorn needs a writable /tmp for worker heartbeats; everything else is
+      # read-only.
+      volumes:
+        - name: tmp
+          emptyDir: {}

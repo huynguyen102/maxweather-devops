@@ -1,0 +1,32 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Staging: the pre-production namespace. Lighter sizing than prod.
+namespace: staging
+
+resources:
+  - ../../base
+
+# At deploy time, point this at the real ECR repo:
+#   kustomize edit set image maxweather-app=$(terraform output -raw ecr_repository_url):<tag>
+images:
+  - name: maxweather-app
+    newName: PLACEHOLDER_ECR_URL
+    newTag: staging
+
+replicas:
+  - name: maxweather
+    count: 1
+
+# Smaller HPA envelope in staging.
+patches:
+  - target:
+      kind: HorizontalPodAutoscaler
+      name: maxweather
+    patch: |
+      - op: replace
+        path: /spec/minReplicas
+        value: 1
+      - op: replace
+        path: /spec/maxReplicas
+        value: 4

@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Production namespace. Uses the base sizing (2-10 replicas).
+namespace: prod
+
+resources:
+  - ../../base
+
+# At deploy time, point this at the real ECR repo:
+#   kustomize edit set image maxweather-app=$(terraform output -raw ecr_repository_url):<tag>
+images:
+  - name: maxweather-app
+    newName: PLACEHOLDER_ECR_URL
+    newTag: prod
+
+replicas:
+  - name: maxweather
+    count: 2
