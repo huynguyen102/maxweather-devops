@@ -77,7 +77,7 @@ maxweather-devops/
 |---|---|---|---|
 | 1 | Scaffold repo + README + CLAUDE.md + ADRs | `[x]` | README, CLAUDE.md, .gitignore, docs/adr/{template,0001-0005} |
 | 2 | Architecture & design — docs/architecture.md (diagram + flow + component roles) | `[x]` | docs/architecture.md — Mermaid + control/data plane + failure modes; verify vs reality in phase 8 |
-| 3 | App Flask + Dockerfile (test local) | `[~]` | app.py + requirements.txt written (not committed); Dockerfile + test remaining |
+| 3 | App Flask + Dockerfile (test local) | `[x]` | app.py + Dockerfile + README; verified: docker build + run, /health, real /forecast, 400 on bad input |
 | 4 | Terraform: vpc → ecr → eks → cognito → lambda-authorizer → api-gateway → cloudwatch | `[ ]` | |
 | 5 | K8s YAML (deployment/service/ingress-controller/ingress/hpa) | `[ ]` | |
 | 6 | Jenkinsfile | `[ ]` | |
