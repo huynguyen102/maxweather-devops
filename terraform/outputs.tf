@@ -48,6 +48,12 @@ output "cognito_scope" {
   value       = module.cognito.scope
 }
 
+output "cognito_client_secret" {
+  description = "OAuth2 client secret (for the token exchange; read with terraform output -raw)."
+  value       = module.cognito.client_secret
+  sensitive   = true
+}
+
 output "cognito_issuer" {
   description = "JWT issuer URL (for the Lambda authorizer)."
   value       = module.cognito.issuer

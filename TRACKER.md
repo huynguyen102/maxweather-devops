@@ -81,7 +81,7 @@ maxweather-devops/
 | 4 | Terraform: vpc → ecr → eks → cognito → lambda-authorizer → api-gateway → cloudwatch | `[x]` | 7 modules, root wiring; terraform validate = Success; plan/apply at phase 8 (needs creds) |
 | 5 | K8s YAML (deployment/service/ingress-controller/ingress/hpa) | `[x]` | kustomize base + staging/prod overlays; platform: namespaces, metrics-server, ingress-nginx, cluster-autoscaler; kubeconform valid |
 | 6 | Jenkinsfile | `[x]` | declarative pipeline build→ECR→staging→approval→prod; validated green via pipeline-model-converter (real Jenkins in Docker) |
-| 7 | Postman collection | `[ ]` | |
+| 7 | Postman collection | `[x]` | 3-request collection (token / authorized / denied), no secrets; JSON valid; newman ready for phase 8 |
 | 8 | Deploy live → evidence (CloudWatch logs, HPA scale, API+auth) → destroy + verify diagram matches reality | `[ ]` | |
 
 ## Deliverable ↔ phase (submission checklist)

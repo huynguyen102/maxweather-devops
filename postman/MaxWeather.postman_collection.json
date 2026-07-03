@@ -1,0 +1,113 @@
+{
+  "info": {
+    "name": "Max Weather API",
+    "description": "Demonstrates the OAuth2-protected weather API: obtain a token from Cognito (client_credentials), call the forecast API with it, and confirm the API rejects an unauthenticated call. Fill the collection variables from Terraform outputs (see postman/README.md); no secrets are stored in this file.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "" },
+    { "key": "token_url", "value": "" },
+    { "key": "client_id", "value": "" },
+    { "key": "client_secret", "value": "" },
+    { "key": "scope", "value": "" },
+    { "key": "access_token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. Get OAuth2 token",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "username", "value": "{{client_id}}", "type": "string" },
+            { "key": "password", "value": "{{client_secret}}", "type": "string" }
+          ]
+        },
+        "header": [
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "grant_type", "value": "client_credentials" },
+            { "key": "scope", "value": "{{scope}}" }
+          ]
+        },
+        "url": { "raw": "{{token_url}}", "host": ["{{token_url}}"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('token issued (200)', function () { pm.response.to.have.status(200); });",
+              "var json = pm.response.json();",
+              "pm.test('response has access_token', function () { pm.expect(json).to.have.property('access_token'); });",
+              "pm.collectionVariables.set('access_token', json.access_token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Get forecast (authorized)",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [{ "key": "token", "value": "{{access_token}}", "type": "string" }]
+        },
+        "url": {
+          "raw": "{{base_url}}/forecast?lat=10.82&lon=106.63",
+          "host": ["{{base_url}}"],
+          "path": ["forecast"],
+          "query": [
+            { "key": "lat", "value": "10.82" },
+            { "key": "lon", "value": "106.63" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('has current weather', function () { pm.expect(pm.response.json()).to.have.property('current'); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Get forecast (no token, expect denied)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "noauth" },
+        "url": {
+          "raw": "{{base_url}}/forecast?lat=10.82&lon=106.63",
+          "host": ["{{base_url}}"],
+          "path": ["forecast"],
+          "query": [
+            { "key": "lat", "value": "10.82" },
+            { "key": "lon", "value": "106.63" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('rejected without a token', function () { pm.expect([401, 403]).to.include(pm.response.code); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
