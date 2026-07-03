@@ -66,6 +66,7 @@ No modules.
 | <a name="output_cluster_name"></a> [cluster\_name](#output\_cluster\_name) | Name of the EKS cluster. |
 | <a name="output_cluster_security_group_id"></a> [cluster\_security\_group\_id](#output\_cluster\_security\_group\_id) | Cluster security group EKS manages for control-plane/node traffic. |
 | <a name="output_node_role_arn"></a> [node\_role\_arn](#output\_node\_role\_arn) | IAM role ARN used by the worker nodes. |
+| <a name="output_node_role_name"></a> [node\_role\_name](#output\_node\_role\_name) | Name of the worker node IAM role (for attaching addon policies). |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer URL of the cluster. |
 | <a name="output_oidc_provider_arn"></a> [oidc\_provider\_arn](#output\_oidc\_provider\_arn) | ARN of the IAM OIDC provider (for IRSA roles). |
 <!-- END_TF_DOCS -->

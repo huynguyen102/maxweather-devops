@@ -57,3 +57,8 @@ output "api_endpoint" {
   description = "Base invoke URL of the API Gateway."
   value       = module.api_gateway.api_endpoint
 }
+
+output "application_log_group" {
+  description = "CloudWatch log group receiving application logs."
+  value       = module.cloudwatch.application_log_group
+}

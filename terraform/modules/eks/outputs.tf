@@ -33,6 +33,11 @@ output "node_role_arn" {
   value       = aws_iam_role.node.arn
 }
 
+output "node_role_name" {
+  description = "Name of the worker node IAM role (for attaching addon policies)."
+  value       = aws_iam_role.node.name
+}
+
 output "cluster_autoscaler_role_arn" {
   description = "IRSA role ARN for the Cluster Autoscaler service account."
   value       = aws_iam_role.cluster_autoscaler.arn

@@ -55,3 +55,12 @@ module "api_gateway" {
   authorizer_function_name = module.lambda_authorizer.function_name
   backend_url              = var.api_backend_url
 }
+
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+
+  name_prefix        = local.name_prefix
+  cluster_name       = module.eks.cluster_name
+  node_role_name     = module.eks.node_role_name
+  log_retention_days = var.log_retention_days
+}

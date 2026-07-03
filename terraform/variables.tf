@@ -79,3 +79,9 @@ variable "api_backend_url" {
   type        = string
   default     = ""
 }
+
+variable "log_retention_days" {
+  description = "Retention for the Container Insights (application) log groups."
+  type        = number
+  default     = 14
+}
