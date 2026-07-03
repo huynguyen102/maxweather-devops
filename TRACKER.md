@@ -64,7 +64,7 @@ maxweather-devops/
 
 ## Convention chốt
 - **Naming**: `{project}-{env}-{component}` → root tính `local.name_prefix`, truyền xuống module.
-- **Tag** (qua `default_tags`): Project · Environment · Component · ManagedBy=terraform · Owner=huyn@tensormesh.ai.
+- **Tag** (qua `default_tags`): Project · Environment · Component · ManagedBy=terraform · Owner=huy.devops.engineer@gmail.com.
 - **Module**: 5 file base (`main/variables/outputs/versions/README`); module lớn tách `main.tf` theo domain (`cluster/node-groups/iam/addons`). Module không chứa provider block.
 
 ---

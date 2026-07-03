@@ -1,6 +1,6 @@
 # CLAUDE.md — Max Weather DevOps
 
-Project guide for Claude Code (and any contributor). This file is the single source of convention; AI-assisted changes must follow it.
+Project guide for Claude Code (and any contributor). This is the single source of convention and working protocol for this repository; AI-assisted changes must follow it.
 
 ## What this is
 Solution to the 101 Digital DevOps Technical Assessment: deploy a weather-forecast platform ("Max Weather") on AWS with high availability, autoscaling, OAuth2-protected APIs, CI/CD, and centralized logging — all provisioned via modular Terraform.
@@ -8,6 +8,30 @@ Solution to the 101 Digital DevOps Technical Assessment: deploy a weather-foreca
 - Architecture: [docs/architecture.md](docs/architecture.md)
 - Decisions: [docs/adr/](docs/adr/)
 - Progress: [TRACKER.md](TRACKER.md)
+
+## Who the author is
+Huy Nguyen (huy.devops.engineer@gmail.com) — Senior DevOps / SRE, ~6 years across DevOps, SRE, and ML infrastructure.
+- Multi-cloud (AWS, Azure, GCP) and Kubernetes (EKS, AKS, GKE); strong Terraform (IaC) and CI/CD across GitHub Actions, Jenkins, GitLab, Azure DevOps.
+- Built SRE foundations from scratch: incident response, on-call, SLOs, observability.
+- AI-augmented engineering with Claude Code; also a DevOps instructor.
+
+**Implications for how to work here:**
+- Assume a senior audience — do **not** over-explain basics; be concise and actionable.
+- Hold a **production-readiness bar**: HA, autoscaling, observability, and security are acceptance criteria, not extras.
+- Instructor mindset — documentation should make the *reasoning* legible, not just list steps.
+
+## Working protocol
+1. **Ground before you claim.** Read the authoritative source first (code, runtime, live AWS) before asserting. Label statements *verified* vs *assumption*; never present an assumption as fact. Treat any README/doc as possibly stale — cross-check against code and actual cloud state.
+2. **Plan before execution, with approval gates.** The first deliverable of multi-step work is the plan (phases, outputs, gates) — it lives in [TRACKER.md](TRACKER.md). Don't run steps before the plan is locked.
+3. **Co-build for understanding, not speed.** For any deliverable with 3+ distinct parts, present the structure first, confirm the order, then work block-by-block — surface raw findings before final prose. The goal is that the author can defend the work to a reviewer. Skip only for trivial single-step tasks or when told "just do it".
+4. **Answer first; options carry rationale.** Answer in plain text before offering to build. Every next-step menu states, per option, what it buys / de-risks / costs — then recommends one. No bare lists.
+5. **No false ownership.** Never write first-person claims that the author did work he didn't. Attribute research neutrally ("from the terraform plan", "from the cluster") without inventing ownership.
+6. **Persist & propagate.** Record decisions as ADRs, keep TRACKER updated, and when a rule changes, update every surface that states it.
+
+Language: Vietnamese for back-and-forth discussion; English for anything committed or shared (repo files, docs, commits).
+
+## Environment
+Commands assume macOS / zsh with `aws`, `kubectl`, `terraform`, `docker`, and `terraform-docs` installed and AWS credentials configured. Don't emit syntax for a shell that isn't in use.
 
 ## Repo map
 ```
@@ -29,10 +53,15 @@ docs/       architecture, naming-and-tagging, configuration, adr/
 
 ## Guardrails
 - **Plan before apply** — never `terraform apply` without showing `plan` first.
-- **Deploy → evidence → destroy** — live deploys are for capturing proof (CloudWatch logs, HPA scaling, API+auth). Run `terraform destroy` after to control cost.
+- **Live AWS is approval-per-time** — any command that mutates real AWS/EKS needs explicit approval *each time*. Subagents are forbidden from mutating the cluster or cloud.
+- **Deploy → evidence → destroy** — live deploys exist to capture proof (CloudWatch logs, HPA scaling, API+auth). Run `terraform destroy` after to control cost.
 - **No secrets in repo** — no API keys, tokens, or `*.secret.tfvars`. Weather source is Open-Meteo (keyless) by design.
 - **Parameterized** — anything environment-specific lives in `variables.tf` + `*.tfvars`, never hardcoded.
 - **Don't merge AI output blind** — generated code is reviewed against these conventions before commit.
+
+## Code & docs style
+- **Self-contained comments** — comments and docstrings explain *what* the code does and *why*, for someone reading only this repo. Do NOT include external names, dates, "corrected"/"earlier note was wrong" history, or references to tickets/chats/meetings/PRs outside the repo. Encode the *result* of a decision, not its source — the source lives in an ADR.
+- **Docs teach** — prefer prose that makes the reasoning legible over bare step lists.
 
 ## How to run
 Filled in as phases land. See TRACKER.md build order.
@@ -41,4 +70,4 @@ Filled in as phases land. See TRACKER.md build order.
 - Deploy/destroy steps: README.md (phase 7)
 
 ## AI-assisted development
-Built with Claude Code as a pair. Discipline is kept via this file (conventions), per-phase conventional commits, ADRs for decisions, and `terraform-docs`. Rationale: [docs/adr/0001-ai-assisted-workflow.md](docs/adr/0001-ai-assisted-workflow.md).
+Built with Claude Code as a pair, deliberately and transparently. Discipline is kept via this file (conventions + protocol), per-phase Conventional Commits, ADRs for decisions, and `terraform-docs`. Rationale: [docs/adr/0001-ai-assisted-workflow.md](docs/adr/0001-ai-assisted-workflow.md).
