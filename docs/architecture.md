@@ -95,8 +95,20 @@ Application writes one structured JSON line per event to **stdout**. A **Fluent 
 
 OAuth2 via Cognito (`client_credentials`) as issuer and a custom Lambda authorizer validating the JWT at the gateway. The workload runs in private subnets (egress via NAT), inbound only through the NLB/Ingress. See [ADR-0003](adr/0003-oauth2-cognito-lambda-authorizer.md).
 
+## Delivery & operations
+- **State** — remote on S3 (encrypted, versioned) with a DynamoDB lock, not local (`terraform/bootstrap`, `terraform/backend.tf`).
+- **Infra CI** — GitHub Actions runs `terraform fmt/validate/plan` on PRs, assuming an AWS role via **GitHub OIDC** (no static keys): `.github/workflows/terraform.yml`.
+- **App CD** — Jenkins builds → pushes ECR → deploys staging → manual approval → promotes the same image to prod. The job is seeded from code via JCasC (`jenkins/casc.yaml`).
+- **One-command bring-up** — `make up` runs infra → platform → wire; `make destroy` tears down in the correct order.
+
 ## Related decisions
+- [ADR-0001](adr/0001-ai-assisted-workflow.md) — AI-assisted, disciplined workflow
 - [ADR-0002](adr/0002-use-eks-for-orchestration.md) — EKS as the orchestration platform
 - [ADR-0003](adr/0003-oauth2-cognito-lambda-authorizer.md) — OAuth2 via Cognito + Lambda authorizer
 - [ADR-0004](adr/0004-single-cluster-two-namespaces.md) — single cluster, staging + prod namespaces
 - [ADR-0005](adr/0005-open-meteo-weather-source.md) — Open-Meteo as the weather source
+- [ADR-0006](adr/0006-single-region-multi-az-dr-deferred.md) — single region, multi-AZ; region DR deferred
+- [ADR-0007](adr/0007-app-cicd-now-infra-cicd-next.md) — app CI/CD now; infra pipeline next
+- [ADR-0008](adr/0008-remote-state-and-oidc-cicd.md) — remote state + OIDC CI/CD
+- [ADR-0009](adr/0009-secret-management.md) — secret management
+- [ADR-0010](adr/0010-kustomize-overlays.md) — Kustomize overlays

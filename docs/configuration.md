@@ -170,6 +170,23 @@ terraform apply -var-file=terraform.tfvars
 
 ---
 
+## Bootstrap (`terraform/bootstrap`)
+A one-time, separately-applied config (local state) that creates the remote-state backend and the CI OIDC role. Run **before** the main stack; the main stack then points at this backend via `terraform/backend.tf`.
+
+**Inputs**
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `project` | string | `maxweather` | Names the bucket, lock table, and CI role. |
+| `region` | string | `ap-southeast-1` | AWS region. |
+| `github_repo` | string | `huynguyen102/maxweather-devops` | Repo allowed to assume the CI role via OIDC. |
+| `create_github_oidc_provider` | bool | `true` | Create the GitHub OIDC provider, or set `false` to reference an existing one (one per account). |
+
+**Creates:** S3 state bucket (versioned, SSE, public-access-blocked), DynamoDB lock table, GitHub OIDC provider (or reference), and the `maxweather-ci` role scoped to the repo (read-only + state access).
+**Outputs:** `state_bucket`, `lock_table`, `ci_role_arn`, `backend_config`.
+
+See [ADR-0008](adr/0008-remote-state-and-oidc-cicd.md).
+
 ## Parameterizing for another environment or region
 Because every environment-specific value is a variable, standing the stack up elsewhere is a matter of values, not code:
 

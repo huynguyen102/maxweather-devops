@@ -93,5 +93,10 @@ maxweather-devops/
 - [x] 6. Postman with auth — postman/ (token / authorized / denied)
 - [ ] Email submission to anurudda@ + rajiv@101digital.io with Gitrepo ID + email
 
-## Bonus (beyond deliverables — ADR-0007)
-- [x] Infra CI/CD design + skeleton — jenkins/Jenkinsfile.infra (validated), terraform/backend.tf.example (remote state)
+## Beyond deliverables (done)
+- [x] Remote state — S3 (encrypted, versioned) + DynamoDB lock (`terraform/bootstrap`, `backend.tf`) — ADR-0008
+- [x] OIDC CI/CD — GitHub Actions assumes an AWS role via OIDC, no static keys (`.github/workflows/terraform.yml`) — live run green — ADR-0008
+- [x] Automation — `Makefile` (`make up`/`verify`/`destroy`) + `k8s/platform/bootstrap.sh`
+- [x] Jenkins job as code — JCasC + Job DSL (`jenkins/casc.yaml`); tool-equipped host image
+- [x] Infra pipeline skeleton — `jenkins/Jenkinsfile.infra` — ADR-0007
+- [x] Docs — traceability matrix, evidence, overview.html; ADRs 0001-0010
