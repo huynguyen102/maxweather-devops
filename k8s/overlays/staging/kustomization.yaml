@@ -30,3 +30,12 @@ patches:
       - op: replace
         path: /spec/maxReplicas
         value: 4
+  # Give staging its own host so it does not collide with prod's catch-all Ingress
+  # on the shared nginx controller. Reach it with: curl -H 'Host: staging.maxweather.local' http://<nlb>
+  - target:
+      kind: Ingress
+      name: maxweather
+    patch: |
+      - op: add
+        path: /spec/rules/0/host
+        value: staging.maxweather.local

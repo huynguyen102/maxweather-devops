@@ -20,6 +20,10 @@ docker build -t maxweather:local .
 docker run --rm -p 8080:8080 maxweather:local
 ```
 
+> Deploying to EKS: the nodes are x86 (t3.medium), so build for that architecture —
+> `docker build --platform linux/amd64 ...` — especially on an Apple Silicon Mac,
+> or the nodes reject the image with "no match for platform".
+
 ## Run without Docker
 ```sh
 python3 -m venv .venv

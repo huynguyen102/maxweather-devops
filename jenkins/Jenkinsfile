@@ -35,7 +35,9 @@ pipeline {
     stage('Build & test image') {
       steps {
         sh '''
-          docker build -t "$ECR_REPO:$IMAGE_TAG" app/
+          # --platform linux/amd64 matches the EKS node architecture (t3.medium = x86);
+          # without it, a build on an arm64 agent produces an image the nodes can't run.
+          docker build --platform linux/amd64 -t "$ECR_REPO:$IMAGE_TAG" app/
           # Smoke-test the built image before it can be pushed or deployed.
           docker rm -f mw-ci-test 2>/dev/null || true
           docker run -d --name mw-ci-test -p 8081:8080 "$ECR_REPO:$IMAGE_TAG"
