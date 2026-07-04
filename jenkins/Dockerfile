@@ -37,5 +37,9 @@ RUN git config --system --add safe.directory '*'
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
 
+# Jenkins Configuration as Code: seed the pipeline job from code on startup.
+COPY casc.yaml /usr/share/jenkins/casc.yaml
+ENV CASC_JENKINS_CONFIG=/usr/share/jenkins/casc.yaml
+
 # Runs as root (compose also sets user: root) so it can use the mounted docker socket.
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"

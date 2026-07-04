@@ -1,0 +1,30 @@
+# Jenkins Configuration as Code (JCasC).
+# On startup Jenkins reads this file and configures itself — including seeding the
+# pipeline job from code (Job DSL) instead of clicking it together in the UI.
+# The job is therefore versioned in the repo and reproducible on any fresh Jenkins.
+jenkins:
+  systemMessage: "Max Weather — CI/CD, configured as code (JCasC)"
+  numExecutors: 2
+
+jobs:
+  - script: |
+      pipelineJob('maxweather') {
+        description('build -> ECR -> staging -> approve -> prod. Seeded via JCasC + Job DSL.')
+        parameters {
+          stringParam('AWS_REGION', 'ap-southeast-1', 'AWS region')
+          stringParam('ECR_REPO', '', 'ECR repository URL: terraform output -raw ecr_repository_url')
+          stringParam('CLUSTER_NAME', 'maxweather-prod-eks', 'EKS cluster name')
+        }
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote { url('file:///workspace/maxweather') }
+                branches('*/main')
+              }
+            }
+            scriptPath('jenkins/Jenkinsfile')
+            lightweight(true)
+          }
+        }
+      }
