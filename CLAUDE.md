@@ -80,10 +80,10 @@ docs/       architecture, naming-and-tagging, configuration, adr/
 - **Docs teach** — prefer prose that makes the reasoning legible over bare step lists.
 
 ## How to run
-Filled in as phases land. See TRACKER.md build order.
-- App local: `cd app && ...` (phase 2)
-- Terraform: `cd terraform && terraform init && terraform plan -var-file=prod.tfvars` (phase 3)
-- Deploy/destroy steps: README.md (phase 7)
+Every phase ships with reproducible test commands so each piece can be verified independently — by the author and by a reviewer.
+- App: build / run / test — [app/README.md](app/README.md)
+- Terraform: `cd terraform && terraform init && terraform validate && terraform plan -var-file=prod.tfvars`
+- Deploy / destroy: README.md
 
 ## AI-assisted development
 Built with Claude Code as a pair, deliberately and transparently. Discipline is kept via this file (conventions + protocol), per-phase Conventional Commits, ADRs for decisions, and `terraform-docs`. Rationale: [docs/adr/0001-ai-assisted-workflow.md](docs/adr/0001-ai-assisted-workflow.md).

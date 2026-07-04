@@ -1,9 +1,9 @@
 # Local Jenkins host for demoing the pipeline end to end.
 # Builds the tool-equipped image (Dockerfile) and wires in what the pipeline needs:
-#   - the host Docker socket  -> the Build stage runs `docker build/push` on the host daemon
+#   - the host Docker socket   -> the Build stage runs `docker build/push` on the host daemon
 #   - the host AWS credentials -> aws/kubectl reach ECR and the EKS cluster (read-only mount)
-#   - the repo                 -> the job can use it as a local Git SCM source (no GitHub needed)
-# See RUNBOOK.md for the full sequence.
+# The pipeline job (and its SCM = the GitHub repo) is seeded from code via JCasC
+# (jenkins/casc.yaml). See RUNBOOK.md for the full sequence.
 services:
   jenkins:
     build: .
@@ -16,7 +16,6 @@ services:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
       - ${HOME}/.aws:/root/.aws:ro
-      - ../:/workspace/maxweather:ro
     restart: unless-stopped
 
 volumes:

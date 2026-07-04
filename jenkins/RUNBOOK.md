@@ -57,12 +57,10 @@ docker compose up -d --build          # first build installs the toolchain (~2-3
 ```
 Open http://localhost:8080 (no login — wizard is disabled).
 
-### 3. Create the pipeline job
-- **New Item** → name `maxweather` → **Pipeline** → OK.
-- Under **Pipeline**: Definition = **Pipeline script from SCM**.
-  - SCM = **Git**, Repository URL = `file:///workspace/maxweather`
-  - Script Path = `jenkins/Jenkinsfile`
-- Save.
+### 3. The pipeline job is created for you (JCasC)
+On boot, Jenkins reads `jenkins/casc.yaml` and seeds the `maxweather` pipeline job
+from code (Job DSL) — SCM = the GitHub repo, script path `jenkins/Jenkinsfile`. No
+manual "New Item": open http://localhost:8080 and the job is already there.
 
 ### 4. Run it
 - **Build with Parameters**:

@@ -19,7 +19,7 @@ jobs:
           cpsScm {
             scm {
               git {
-                remote { url('file:///workspace/maxweather') }
+                remote { url('https://github.com/huynguyen102/maxweather-devops.git') }
                 branches('*/main')
               }
             }
