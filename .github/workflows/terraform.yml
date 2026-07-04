@@ -1,0 +1,38 @@
+name: terraform
+
+# Infra CI on pull requests: fmt / validate / plan. Authenticates to AWS with a
+# short-lived token via GitHub OIDC — there are NO AWS keys stored in this repo.
+on:
+  pull_request:
+    paths:
+      - "terraform/**"
+      - ".github/workflows/terraform.yml"
+  workflow_dispatch:
+
+permissions:
+  id-token: write # required to request the GitHub OIDC token
+  contents: read
+
+jobs:
+  validate-plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Exchange the GitHub OIDC token for short-lived AWS credentials by assuming
+      # the maxweather-ci role (created in terraform/bootstrap). No static keys.
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::905418181527:role/maxweather-ci
+          aws-region: ap-southeast-1
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: fmt / validate / plan
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform fmt -check -recursive
+          terraform validate
+          terraform plan -input=false
