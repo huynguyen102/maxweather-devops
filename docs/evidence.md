@@ -34,6 +34,15 @@ maxweather-7bfdcd494b-mt4mh   3m   85Mi
 ```
 Node tier: `cluster-autoscaler` running in `kube-system` with the IRSA role, discovering the node ASG by tag.
 
+**Dynamic scale-out demo** — load generated against `/health` (`hey -z 150s -c 100`) drove CPU well past the 60% target; the HPA scaled 2 → 10 (max) in ~70s:
+```
+t≈18s   cpu:   2%/60%   replicas=2   (idle)
+t≈36s   cpu: 319%/60%   replicas=2→4
+t≈54s   cpu: 495%/60%   replicas=8
+t≈72s   cpu: 459%/60%   replicas=10  (maxReplicas reached)
+```
+`kubectl top pods -n prod` under load showed all 10 pods at ~270m CPU. After the load stopped, the HPA scales back down. (`/health` is used for the demo because the forecast path is I/O-bound and would not raise CPU.)
+
 ## Req #3 & #4 — API exposed + OAuth2 protection
 `newman run postman/MaxWeather.postman_collection.json` against the live API Gateway — **5/5 assertions passed**:
 ```
@@ -61,7 +70,7 @@ container image `maxweather-prod-app:a4fe52a`), and the nginx ingress access log
 are captured in the same group.
 
 ## Notes
-- The app is I/O-bound (a thin proxy to Open-Meteo), so CPU stays low; a sustained
-  scale-out demo needs concurrent load heavy enough to raise CPU above the 60% target.
+- The forecast path is I/O-bound (a thin proxy to Open-Meteo) so it barely uses CPU;
+  the scale-out demo therefore loads `/health` (pure CPU) to exercise the CPU-based HPA.
 - API Gateway control-plane and NLB were provisioned in `ap-southeast-1`; the API
   endpoint above was live at capture time and removed on teardown.
