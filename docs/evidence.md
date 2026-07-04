@@ -69,6 +69,18 @@ Fluent Bit enriches each record with Kubernetes metadata (pod, namespace,
 container image `maxweather-prod-app:a4fe52a`), and the nginx ingress access logs
 are captured in the same group.
 
+## Hardening — remote state + OIDC CI/CD
+State was moved to an encrypted, versioned S3 bucket with a DynamoDB lock
+(`terraform/bootstrap`). The infra CI pipeline (`.github/workflows/terraform.yml`)
+authenticates to AWS via **GitHub OIDC — no static keys**. A live run was green:
+```
+Assuming role with OIDC → arn:aws:iam::905418181527:role/maxweather-ci
+Authenticated as assumedRoleId AROA...:GitHubActions
+Terraform has been successfully initialized!   (S3 backend)
+terraform plan → "... will be created"          (read-only CI role)
+```
+See [ADR-0008](adr/0008-remote-state-and-oidc-cicd.md).
+
 ## Notes
 - The forecast path is I/O-bound (a thin proxy to Open-Meteo) so it barely uses CPU;
   the scale-out demo therefore loads `/health` (pure CPU) to exercise the CPU-based HPA.
