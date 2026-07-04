@@ -25,12 +25,7 @@ The delivery package is read by the reviewer on its own; the meeting is **questi
 | Jenkins | Jenkinsfile runnable on any Jenkins + docker-compose for local demo |
 
 ## Architecture
-```
-Frontend → API Gateway (proxy) → Lambda Authorizer → validate Cognito JWT
-                │
-                ▼  NLB → Nginx Ingress → Service → Deployment (pods → Open-Meteo)
-   HA: VPC 2 AZ, node group 2 AZ · Scale: HPA + Cluster Autoscaler · Logs: Container Insights → CloudWatch
-```
+See [docs/architecture.md](docs/architecture.md) — Mermaid diagram + control/data plane + failure modes.
 
 ## Scope contract (6 deliverables)
 | # | Deliverable | Out of scope |

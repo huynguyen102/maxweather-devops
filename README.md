@@ -5,12 +5,18 @@ Production-ready weather-forecast platform on AWS: highly available, autoscaling
 **→ Requirement & deliverable traceability (what, where, evidence): [docs/traceability.md](docs/traceability.md)**
 
 ## Architecture
+```mermaid
+flowchart LR
+    FE["Frontend dev"] -->|"Bearer token"| GW["API Gateway<br/>(proxy)"]
+    GW -->|"authorize"| AUTH["Lambda<br/>Authorizer"]
+    AUTH -.->|"verify JWT · JWKS"| COG["Cognito"]
+    GW -->|"proxy"| NLB["NLB<br/>(2 AZ)"]
+    NLB --> ING["Nginx<br/>Ingress"] --> SVC["Service"] --> POD["Flask pods<br/>(HPA + Cluster Autoscaler)"]
+    POD -->|"egress"| OM["Open-Meteo"]
+    POD -.->|"stdout logs"| CW["CloudWatch"]
 ```
-Frontend → API Gateway (proxy) → Lambda Authorizer → validate Cognito JWT
-                │
-                ▼  NLB → Nginx Ingress → Service → Deployment (pods → Open-Meteo)
-   HA: VPC 2 AZ, node group 2 AZ · Scale: HPA + Cluster Autoscaler · Logs: Container Insights → CloudWatch
-```
+**HA:** VPC + nodes across 2 AZ · **Scale:** HPA (pods) + Cluster Autoscaler (nodes) · **Logs:** Fluent Bit → CloudWatch.
+
 Full diagram + control/data-plane walkthrough: [docs/architecture.md](docs/architecture.md). One-page overview: [docs/overview.html](docs/overview.html).
 
 ## Repo map
