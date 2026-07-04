@@ -18,7 +18,14 @@ resource "aws_apigatewayv2_api" "this" {
 
 # HTTP_PROXY forwards the matched path to the backend. {proxy} carries the path
 # captured by the route below (e.g. /forecast).
+#
+# Gated on backend_url: API Gateway rejects an integration without a valid HTTP
+# endpoint, and the backend (the Nginx Ingress NLB) does not exist until the
+# cluster is up. So the first apply creates the API/authorizer/stage; the second
+# apply — once backend_url is the NLB hostname — creates the integration + route.
 resource "aws_apigatewayv2_integration" "backend" {
+  count = var.backend_url != "" ? 1 : 0
+
   api_id                 = aws_apigatewayv2_api.this.id
   integration_type       = "HTTP_PROXY"
   integration_method     = "ANY"
@@ -28,9 +35,11 @@ resource "aws_apigatewayv2_integration" "backend" {
 
 # Catch-all route, protected by the custom authorizer.
 resource "aws_apigatewayv2_route" "proxy" {
+  count = var.backend_url != "" ? 1 : 0
+
   api_id             = aws_apigatewayv2_api.this.id
   route_key          = "ANY /{proxy+}"
-  target             = "integrations/${aws_apigatewayv2_integration.backend.id}"
+  target             = "integrations/${aws_apigatewayv2_integration.backend[0].id}"
   authorization_type = "CUSTOM"
   authorizer_id      = aws_apigatewayv2_authorizer.this.id
 }
