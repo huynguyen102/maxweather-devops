@@ -1,0 +1,19 @@
+# Remote state for the Terraform stack — BONUS / next step (see ADR-0007).
+#
+# The stack currently uses local state. To move to shared, locked remote state:
+#   1. Create the S3 bucket and DynamoDB table first (bootstrap out-of-band or via a
+#      small separate stack) — Terraform cannot create its own backend.
+#   2. Rename this file to backend.tf and run: terraform init -migrate-state
+#
+# The DynamoDB table provides state locking so two applies (or two engineers) can't
+# clobber each other; S3 with encryption + versioning stores and protects the state.
+#
+# terraform {
+#   backend "s3" {
+#     bucket         = "maxweather-tfstate-<account-id>"
+#     key            = "maxweather/prod/terraform.tfstate"
+#     region         = "ap-southeast-1"
+#     dynamodb_table = "maxweather-tflock"
+#     encrypt        = true
+#   }
+# }

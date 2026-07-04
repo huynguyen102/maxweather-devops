@@ -1,0 +1,78 @@
+// Infrastructure CI/CD for the Terraform stack — BONUS / roadmap (see ADR-0007).
+// This is NOT assessment deliverable #4; that is the application pipeline
+// (jenkins/Jenkinsfile). This one gates changes to infrastructure.
+//
+// Prerequisites before it can run for real:
+//   - remote state: S3 backend + DynamoDB lock (see terraform/backend.tf.example)
+//   - agent tools: terraform, tflint, tfsec
+//   - a least-privilege IAM role assumed via OIDC (never a static key)
+//
+// Intended triggers: pull request -> Plan only; merge to main -> Plan + Approve + Apply.
+pipeline {
+  agent any
+
+  parameters {
+    booleanParam(name: 'APPLY', defaultValue: false, description: 'Apply after approval (main only). PRs run plan only.')
+  }
+
+  options {
+    disableConcurrentBuilds()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+  }
+
+  environment {
+    TF_IN_AUTOMATION = 'true'
+    TF_INPUT         = '0'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Lint & validate') {
+      steps {
+        dir('terraform') {
+          sh '''
+            terraform fmt -check -recursive
+            terraform init -input=false
+            terraform validate
+            tflint --recursive
+            tfsec .
+          '''
+        }
+      }
+    }
+
+    stage('Plan') {
+      steps {
+        dir('terraform') {
+          sh 'terraform plan -input=false -out=tfplan'
+          // In a real setup, publish the plan to the PR (e.g. as a comment) for review.
+        }
+      }
+    }
+
+    stage('Approve') {
+      when {
+        expression { return params.APPLY }
+      }
+      steps {
+        input message: 'Apply this Terraform plan to infrastructure?', ok: 'Apply'
+      }
+    }
+
+    stage('Apply') {
+      when {
+        expression { return params.APPLY }
+      }
+      steps {
+        dir('terraform') {
+          sh 'terraform apply -input=false tfplan'
+        }
+      }
+    }
+  }
+}

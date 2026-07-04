@@ -82,13 +82,16 @@ maxweather-devops/
 | 5 | K8s YAML (deployment/service/ingress-controller/ingress/hpa) | `[x]` | kustomize base + staging/prod overlays; platform: namespaces, metrics-server, ingress-nginx, cluster-autoscaler; kubeconform valid |
 | 6 | Jenkinsfile | `[x]` | declarative pipeline build→ECR→staging→approval→prod; validated green via pipeline-model-converter (real Jenkins in Docker) |
 | 7 | Postman collection | `[x]` | 3-request collection (token / authorized / denied), no secrets; JSON valid; newman ready for phase 8 |
-| 8 | Deploy live → evidence (CloudWatch logs, HPA scale, API+auth) → destroy + verify diagram matches reality | `[ ]` | |
+| 8 | Deploy live → evidence (CloudWatch logs, HPA scale, API+auth) → destroy + verify diagram matches reality | `[x]` | live on account 905418181527; all reqs proven (docs/evidence.md); destroyed clean (54 resources, 0 leftover) |
 
 ## Deliverable ↔ phase (submission checklist)
-- [ ] 1. Architecture diagram — phase 2 (verified against reality in phase 8)
-- [ ] 2. Modular Terraform (tested before submission) — phase 4, 8
-- [ ] 3. K8s artifacts — phase 5
-- [ ] 4. Jenkins pipeline — phase 6
-- [ ] 5. App API in API Gateway — phase 4, 8
-- [ ] 6. Postman with auth — phase 7, 8
+- [x] 1. Architecture diagram — docs/architecture.md (verified against live reality)
+- [x] 2. Modular Terraform — 7 modules; validated + applied live
+- [x] 3. K8s artifacts — kustomize base + overlays + platform
+- [x] 4. Jenkins pipeline — jenkins/Jenkinsfile (validated)
+- [x] 5. App API in API Gateway — proxy + Cognito Lambda authorizer (newman 5/5 live)
+- [x] 6. Postman with auth — postman/ (token / authorized / denied)
 - [ ] Email submission to anurudda@ + rajiv@101digital.io with Gitrepo ID + email
+
+## Bonus (beyond deliverables — ADR-0007)
+- [x] Infra CI/CD design + skeleton — jenkins/Jenkinsfile.infra (validated), terraform/backend.tf.example (remote state)
