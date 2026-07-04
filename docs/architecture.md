@@ -85,6 +85,8 @@ Two tiers, both required by "scalable based on traffic":
 
 With only HPA, pods go `Pending` once nodes are full; with only CA, nodes grow but pod count does not follow traffic. Both together give elastic scale, then scale back down to control cost.
 
+Autoscaling is **core here, not an add-on**, because the load is spiky and predictable — people check the forecast in the morning. Fixed capacity would force a bad trade: size for the peak and pay for idle capacity most of the day, or size for the average and fall over at peak. Autoscaling is the only way to stay available at peak *and* avoid paying for idle capacity off-peak — scaling out protects availability, scaling in controls cost, and both happen without manual intervention. Because the spike is CPU-driven and predictable, reactive HPA on CPU is sufficient; no predictive or scheduled scaling is needed.
+
 ## Observability
 
 Application writes one structured JSON line per event to **stdout**. A **Fluent Bit DaemonSet** on each node tails container stdout and ships it to **CloudWatch Logs**. The app holds no AWS credentials and no CloudWatch SDK — log transport is the platform's responsibility, which keeps the app portable across clouds.
