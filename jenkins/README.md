@@ -29,18 +29,17 @@ with an instance profile, or configured credentials).
 
 ## Run Jenkins locally (demo)
 ```sh
-docker compose up -d
-# initial admin password:
-docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+docker compose up -d --build
 ```
-Open http://localhost:8080, install suggested plugins, create a **Pipeline** job
-with "Pipeline script from SCM" pointing at this repo and script path
-`jenkins/Jenkinsfile`, then run with the parameters above.
+`docker compose` builds a tool-equipped image ([Dockerfile](Dockerfile): Jenkins +
+`docker`/`aws`/`kubectl`/`kustomize` + pipeline plugins, setup wizard disabled) and
+mounts the Docker socket, `~/.aws`, and the repo. Open http://localhost:8080 (no login).
 
-> The stock `jenkins/jenkins` image has no `docker`/`aws`/`kubectl`/`kustomize`.
-> For a real run, use an agent image that bundles them (or install them on the
-> controller for a demo). The compose file mounts the Docker socket so the build
-> stage can reach the host Docker.
+**The full host design and the exact end-to-end run steps (provision → run pipeline
+→ approve → verify → tear down) are in [RUNBOOK.md](RUNBOOK.md).**
+
+There is also an infra pipeline skeleton, [Jenkinsfile.infra](Jenkinsfile.infra)
+(bonus — see [ADR-0007](../docs/adr/0007-app-cicd-now-infra-cicd-next.md)).
 
 ## Validate the Jenkinsfile
 ```sh
