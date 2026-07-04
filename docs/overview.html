@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Max Weather — DevOps Assessment Overview</title>
+<style>
+  :root{
+    --ground:#eef2f7; --surface:#ffffff; --surface-2:#e6edf5;
+    --ink:#15202e; --muted:#57697d; --line:#d3ddea;
+    --accent:#0f74c7; --accent-2:#0a578f; --on-accent:#ffffff;
+    --good:#1a7f4b; --good-bg:#e4f3ea; --warn:#9a6206; --warn-bg:#f7edda;
+    --font-sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --font-mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    --maxw:760px;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0d1520; --surface:#131f2e; --surface-2:#1b2a3c;
+      --ink:#e6eef8; --muted:#93a5bb; --line:#27384b;
+      --accent:#4aa8ff; --accent-2:#8cc7ff; --on-accent:#0a1622;
+      --good:#54cf88; --good-bg:#122a1e; --warn:#e0a94a; --warn-bg:#2c2413;
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#eef2f7; --surface:#ffffff; --surface-2:#e6edf5;
+    --ink:#15202e; --muted:#57697d; --line:#d3ddea;
+    --accent:#0f74c7; --accent-2:#0a578f; --on-accent:#ffffff;
+    --good:#1a7f4b; --good-bg:#e4f3ea; --warn:#9a6206; --warn-bg:#f7edda;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d1520; --surface:#131f2e; --surface-2:#1b2a3c;
+    --ink:#e6eef8; --muted:#93a5bb; --line:#27384b;
+    --accent:#4aa8ff; --accent-2:#8cc7ff; --on-accent:#0a1622;
+    --good:#54cf88; --good-bg:#122a1e; --warn:#e0a94a; --warn-bg:#2c2413;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--font-sans); line-height:1.62; font-size:17px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 20px}
+  header.top{
+    position:sticky; top:0; z-index:10; background:color-mix(in srgb,var(--ground) 88%, transparent);
+    backdrop-filter:saturate(1.4) blur(8px); border-bottom:1px solid var(--line);
+  }
+  .top .wrap{display:flex; align-items:center; gap:12px; height:52px}
+  .top .brand{font-weight:700; letter-spacing:-.01em; font-size:15px; margin-right:auto}
+  .top .brand span{color:var(--accent)}
+  .toggle{
+    font-family:var(--font-mono); font-size:12px; color:var(--muted);
+    background:var(--surface); border:1px solid var(--line); border-radius:999px;
+    padding:6px 12px; cursor:pointer;
+  }
+  .toggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+  .hero{padding:40px 0 8px}
+  .eyebrow{
+    font-family:var(--font-mono); text-transform:uppercase; letter-spacing:.14em;
+    font-size:12px; color:var(--accent); margin:0 0 10px
+  }
+  h1{font-size:clamp(28px,7vw,40px); line-height:1.1; margin:0 0 12px; letter-spacing:-.02em; text-wrap:balance}
+  .lede{font-size:18px; color:var(--muted); margin:0 0 18px; max-width:60ch}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px}
+  .chip{
+    font-family:var(--font-mono); font-size:12.5px; border:1px solid var(--line);
+    background:var(--surface); border-radius:999px; padding:5px 11px; color:var(--muted)
+  }
+  .chip.ok{color:var(--good); border-color:color-mix(in srgb,var(--good) 40%, var(--line)); background:var(--good-bg)}
+
+  nav.toc{margin:26px 0 8px}
+  nav.toc ul{list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:8px}
+  nav.toc a{
+    display:block; font-family:var(--font-mono); font-size:13px; text-decoration:none;
+    color:var(--ink); background:var(--surface); border:1px solid var(--line);
+    border-radius:8px; padding:7px 11px
+  }
+  nav.toc a:hover{border-color:var(--accent); color:var(--accent)}
+
+  section{padding:30px 0; border-top:1px solid var(--line)}
+  h2{font-size:24px; letter-spacing:-.015em; margin:0 0 6px; scroll-margin-top:64px}
+  h2 .num{font-family:var(--font-mono); color:var(--accent); font-size:15px; margin-right:8px}
+  .sub{color:var(--muted); margin:0 0 18px}
+  h3{font-size:17px; margin:22px 0 6px}
+  p{margin:0 0 14px}
+  a{color:var(--accent)}
+  strong{color:var(--ink)}
+
+  .grid{display:grid; gap:12px}
+  @media(min-width:560px){.grid.two{grid-template-columns:1fr 1fr}}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px}
+  .card h3{margin:0 0 4px; font-size:16px}
+  .card p{margin:0; color:var(--muted); font-size:15px}
+  .card .k{font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--accent)}
+
+  ul.clean{margin:0 0 14px; padding-left:20px}
+  ul.clean li{margin:6px 0}
+
+  pre{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:14px 14px; overflow-x:auto; margin:10px 0;
+  }
+  pre code{font-family:var(--font-mono); font-size:13.5px; line-height:1.55; color:var(--ink); white-space:pre}
+  code.inline{font-family:var(--font-mono); font-size:.88em; background:var(--surface-2); padding:1px 6px; border-radius:5px}
+
+  .flow{
+    font-family:var(--font-mono); font-size:13px; color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--line); border-radius:10px;
+    padding:16px; overflow-x:auto; line-height:1.7; white-space:pre
+  }
+
+  .timeline{display:flex; flex-direction:column; gap:0}
+  .phase{display:grid; grid-template-columns:40px 1fr; gap:14px; padding:16px 0; border-bottom:1px solid var(--line)}
+  .phase:last-child{border-bottom:0}
+  .phase .n{
+    width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-weight:700; font-size:14px;
+    background:var(--accent); color:var(--on-accent)
+  }
+  .phase.bonus .n{background:var(--surface); color:var(--accent); border:1px dashed var(--accent)}
+  .phase h3{margin:2px 0 4px; font-size:16px}
+  .phase p{margin:0; color:var(--muted); font-size:15px}
+  .phase .files{font-family:var(--font-mono); font-size:12.5px; color:var(--accent); margin-top:6px; word-break:break-word}
+
+  table{width:100%; border-collapse:collapse; font-size:14.5px}
+  .scroll{overflow-x:auto; border:1px solid var(--line); border-radius:10px; margin:10px 0}
+  .scroll table{min-width:460px}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600}
+  tr:last-child td{border-bottom:0}
+  td.mono,.tnum{font-family:var(--font-mono); font-variant-numeric:tabular-nums}
+
+  .stats{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media(min-width:560px){.stats{grid-template-columns:repeat(4,1fr)}}
+  .stat{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px}
+  .stat .v{font-family:var(--font-mono); font-size:22px; font-weight:700; color:var(--accent); letter-spacing:-.02em}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:2px}
+
+  details{background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:10px 0; overflow:hidden}
+  details[open]{border-color:color-mix(in srgb,var(--accent) 40%, var(--line))}
+  summary{
+    cursor:pointer; padding:14px 16px; font-weight:600; list-style:none;
+    display:flex; align-items:center; gap:10px
+  }
+  summary::-webkit-details-marker{display:none}
+  summary .step{font-family:var(--font-mono); font-size:12px; color:var(--on-accent); background:var(--accent); border-radius:6px; padding:2px 8px}
+  summary::after{content:"+"; margin-left:auto; color:var(--muted); font-family:var(--font-mono)}
+  details[open] summary::after{content:"–"}
+  details .body{padding:0 16px 16px}
+  details .body p:first-child{margin-top:0}
+
+  .note{border-left:3px solid var(--warn); background:var(--warn-bg); border-radius:0 8px 8px 0; padding:10px 14px; margin:12px 0; font-size:15px}
+  .note b{color:var(--ink)}
+
+  footer{padding:34px 0 60px; color:var(--muted); font-size:14px; border-top:1px solid var(--line)}
+  footer code{font-family:var(--font-mono)}
+
+  a:focus-visible,summary:focus-visible,details:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Max Weather <span>/ DevOps</span></div>
+    <button class="toggle" id="themeBtn" type="button" aria-label="Toggle theme">theme</button>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow">101 Digital · Technical Assessment</p>
+    <h1>A weather platform on AWS, built and proven end to end</h1>
+    <p class="lede">Highly available, autoscaling, OAuth2-protected APIs on EKS — provisioned with modular Terraform, shipped via Jenkins, observed through CloudWatch. This page is the whole story: what was asked, how it was built, and how to stand it up.</p>
+    <div class="chips">
+      <span class="chip ok">Deployed live &amp; verified</span>
+      <span class="chip ok">Torn down clean · $0</span>
+      <span class="chip">23 commits</span>
+      <span class="chip">ap-southeast-1</span>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="Contents">
+    <ul>
+      <li><a href="#brief">The brief</a></li>
+      <li><a href="#arch">Architecture</a></li>
+      <li><a href="#build">Build process</a></li>
+      <li><a href="#results">Live results</a></li>
+      <li><a href="#lessons">Lessons</a></li>
+      <li><a href="#provision">Provision guide</a></li>
+      <li><a href="#repo">Repo map</a></li>
+    </ul>
+  </nav>
+
+  <section id="brief">
+    <h2>The brief</h2>
+    <p class="sub">"Max Weather" wants a weather-forecast platform on AWS. It is a platform, not an app — every choice serves four pillars distilled from the seven requirements.</p>
+    <div class="grid two">
+      <div class="card"><p class="k">Availability</p><h3>Run 24/7, scale with traffic</h3><p>Forecast traffic spikes in the morning — predictable and spiky. Autoscaling is core, and it must survive AZ/pod failure.</p></div>
+      <div class="card"><p class="k">API + Security</p><h3>APIs, protected by OAuth2</h3><p>The product is the API that Max Weather's own frontend developers consume — with a contract and access control.</p></div>
+      <div class="card"><p class="k">Delivery</p><h3>CI/CD, reproducible IaC</h3><p>Ship safely (staging → prod) and rebuild anywhere from parameterized Terraform — never by hand.</p></div>
+      <div class="card"><p class="k">Observability</p><h3>Centralized logs</h3><p>Application logs flow to CloudWatch — the eyes needed to operate the platform.</p></div>
+    </div>
+    <h3>Six deliverables</h3>
+    <ul class="clean">
+      <li>Architecture diagram</li>
+      <li>Modular, parameterized Terraform</li>
+      <li>Kubernetes artifacts (Deployment, Service, Nginx Ingress Controller, Ingress)</li>
+      <li>Jenkins pipeline to deploy into the cluster</li>
+      <li>App API exposed through AWS API Gateway</li>
+      <li>Postman collection demonstrating the API with authentication</li>
+    </ul>
+  </section>
+
+  <section id="arch">
+    <h2>Architecture</h2>
+    <p class="sub">The request path (data plane) and what manages it (control plane).</p>
+    <div class="flow">Frontend dev
+   │  HTTPS + Bearer token
+   ▼
+API Gateway ──▶ Lambda Authorizer ──▶ Cognito (JWKS)
+   │  proxy
+   ▼
+NLB ─▶ Nginx Ingress ─▶ Service ─▶ Pods (Flask) ─▶ Open-Meteo
+                                         │
+                             stdout ─▶ Fluent Bit ─▶ CloudWatch</div>
+
+    <h3>Control plane vs data plane</h3>
+    <p><strong>Data plane</strong> carries user traffic — every hop above is on the critical path. <strong>Control plane</strong> (EKS API/scheduler, HPA, Cluster Autoscaler, Cognito, Jenkins, Terraform) decides and manages but sits off the path. If the control plane degrades, running pods keep serving; you only lose the ability to <em>change</em>. That split drives incident triage.</p>
+
+    <h3>High availability &amp; failure modes</h3>
+    <div class="scroll"><table>
+      <tr><th>Failure</th><th>Response</th><th>User impact</th></tr>
+      <tr><td>1 pod</td><td>kubelet restarts; replica count held</td><td>None</td></tr>
+      <tr><td>1 node</td><td>reschedule; Cluster Autoscaler adds node</td><td>Brief / none</td></tr>
+      <tr><td>1 AZ</td><td>NLB shifts to survivor; pods rebuilt in healthy AZ</td><td>Short blip</td></tr>
+      <tr><td>Traffic spike</td><td>HPA adds pods; CA adds nodes (two tiers)</td><td>None</td></tr>
+      <tr><td>Open-Meteo down</td><td>5s timeout → 502; pod stays healthy</td><td>Degraded, platform up</td></tr>
+    </table></div>
+
+    <h3>Why autoscaling is core</h3>
+    <p>Spiky, predictable load forces the choice: fixed capacity either wastes money off-peak or falls over at peak. Autoscaling is the only way to be both available and cost-efficient — scale out protects availability, scale in controls cost, no manual toil. Two tiers: <strong>HPA</strong> scales pods on CPU; <strong>Cluster Autoscaler</strong> scales nodes when pods can't fit.</p>
+
+    <h3>Security &amp; logging</h3>
+    <p>OAuth2 via Cognito (<code class="inline">client_credentials</code>) as issuer; a custom API Gateway Lambda authorizer validates the JWT (signature via JWKS, issuer, expiry, scope). Pods run in private subnets, egress via NAT. App writes structured JSON to stdout; the CloudWatch observability addon (Fluent Bit) ships it — the app holds no AWS credentials, so it stays portable.</p>
+  </section>
+
+  <section id="build">
+    <h2>Build process</h2>
+    <p class="sub">Eight phases, one commit each — the git history reads as the process. Every phase was verified before moving on.</p>
+    <div class="timeline">
+      <div class="phase"><div class="n">1</div><div><h3>Scaffold &amp; conventions</h3><p>Repo, README, CLAUDE.md (conventions + guardrails), ADRs, .gitignore.</p></div></div>
+      <div class="phase"><div class="n">2</div><div><h3>Architecture &amp; design</h3><p>Designed first so every later phase implements against it: control/data plane, flow, failure modes.</p><div class="files">docs/architecture.md</div></div></div>
+      <div class="phase"><div class="n">3</div><div><h3>Application</h3><p>Stateless Flask proxy — <code class="inline">/health</code> probe, <code class="inline">/forecast</code> over Open-Meteo. Non-root container. Verified with docker build + curl.</p><div class="files">app/</div></div></div>
+      <div class="phase"><div class="n">4</div><div><h3>Terraform (7 modules)</h3><p>vpc · ecr · eks · cognito · lambda-authorizer · api-gateway · cloudwatch. 5-file module anatomy, default_tags, name_prefix. <code class="inline">terraform validate</code> green.</p><div class="files">terraform/modules/*</div></div></div>
+      <div class="phase"><div class="n">5</div><div><h3>Kubernetes</h3><p>Kustomize base + staging/prod overlays; platform: namespaces, metrics-server, ingress-nginx, cluster-autoscaler. kubeconform valid.</p><div class="files">k8s/</div></div></div>
+      <div class="phase"><div class="n">6</div><div><h3>Jenkins pipeline</h3><p>build → ECR → deploy staging → manual approval → promote same image to prod. Validated with the declarative linter.</p><div class="files">jenkins/Jenkinsfile</div></div></div>
+      <div class="phase"><div class="n">7</div><div><h3>Postman</h3><p>Get token → authorized forecast → no-token rejected. No secrets in the file.</p><div class="files">postman/</div></div></div>
+      <div class="phase"><div class="n">8</div><div><h3>Deploy live &amp; verify</h3><p>Provisioned on real AWS, proved every requirement (below), then destroyed clean — 54 resources, 0 leftover.</p><div class="files">docs/evidence.md</div></div></div>
+      <div class="phase bonus"><div class="n">+</div><div><h3>Bonus — infra CI/CD</h3><p>Terraform pipeline skeleton + remote-state design (S3 + DynamoDB) + a tool-equipped Jenkins host image.</p><div class="files">jenkins/Jenkinsfile.infra · ADR-0007</div></div></div>
+    </div>
+  </section>
+
+  <section id="results">
+    <h2>Live results</h2>
+    <p class="sub">Captured from a real deployment, then torn down. Full detail in docs/evidence.md.</p>
+    <div class="stats">
+      <div class="stat"><div class="v">2 / 2 AZ</div><div class="l">prod pods spread across zones (HA)</div></div>
+      <div class="stat"><div class="v">2 → 10</div><div class="l">HPA scaled under load (CPU 495%/60%)</div></div>
+      <div class="stat"><div class="v">5 / 5</div><div class="l">Postman assertions (OAuth2 chain)</div></div>
+      <div class="stat"><div class="v">401</div><div class="l">no-token request rejected</div></div>
+    </div>
+    <h3>What was proven</h3>
+    <ul class="clean">
+      <li><strong>API + OAuth2 end to end</strong> — token issued, authorized call returns forecast (200), no-token call blocked (401): API Gateway → Lambda authorizer → NLB → Ingress → pod → Open-Meteo.</li>
+      <li><strong>Autoscaling under real load</strong> — load on <code class="inline">/health</code> drove CPU past target; HPA scaled 2→10 in ~70s, then back down.</li>
+      <li><strong>Logs in CloudWatch</strong> — structured app logs (<code class="inline">"message":"forecast served"</code>) enriched with pod/namespace/image metadata by Fluent Bit.</li>
+    </ul>
+  </section>
+
+  <section id="lessons">
+    <h2>Lessons from the live run</h2>
+    <p class="sub">Five real issues that <code class="inline">validate</code> could not catch — only deploying could. Each is fixed and documented.</p>
+    <ul class="clean">
+      <li><strong>Arch mismatch</strong> — an image built on Apple Silicon (arm64) won't run on x86 EKS nodes ("no match for platform"). Fix: <code class="inline">docker build --platform linux/amd64</code>.</li>
+      <li><strong>Ingress collision</strong> — two catch-all Ingresses can't coexist on one nginx controller. Fix: staging gets its own host; prod keeps the catch-all API Gateway proxies to.</li>
+      <li><strong>API Gateway needs a real backend</strong> — the integration can't be created with an empty URL, and the NLB doesn't exist until k8s runs. Hence the two-phase apply.</li>
+      <li><strong>Teardown order</strong> — delete the k8s LoadBalancer (NLB) and ECR images <em>before</em> <code class="inline">terraform destroy</code>, or VPC/repo deletion fails.</li>
+      <li><strong>Docker-out-of-Docker</strong> — a CI smoke test can't <code class="inline">curl localhost</code> a published port; test inside the container instead.</li>
+    </ul>
+  </section>
+
+  <section id="provision">
+    <h2>Provision guide</h2>
+    <p class="sub">Stand the whole thing up, run it, and tear it down. Region <code class="inline">ap-southeast-1</code>. Full commands in jenkins/RUNBOOK.md and k8s/platform/README.md.</p>
+    <div class="note"><b>Costs money.</b> This provisions EKS + NAT + NLB. Tear down when done (step 6).</div>
+
+    <details><summary><span class="step">1</span> Infrastructure (Terraform)</summary>
+      <div class="body">
+        <p>Two-phase: the API Gateway is wired to the ingress NLB only after the cluster exists.</p>
+        <pre><code>cd terraform
+terraform init
+terraform apply                 # ~15-20 min (EKS)</code></pre>
+        <p>Outputs give you the cluster name, ECR URL, Cognito endpoints, API endpoint.</p>
+      </div>
+    </details>
+
+    <details><summary><span class="step">2</span> Platform (once per cluster)</summary>
+      <div class="body">
+        <p>Cluster-wide pieces the app depends on — not in the app pipeline.</p>
+        <pre><code>aws eks update-kubeconfig --name "$(terraform output -raw cluster_name)" --region ap-southeast-1
+kubectl apply -f ../k8s/platform/namespaces.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.11.3/deploy/static/provider/aws/deploy.yaml
+# cluster-autoscaler: substitute role ARN + cluster name (see k8s/platform/README.md)</code></pre>
+        <p><strong>metrics-server</strong> feeds the HPA · <strong>ingress-nginx</strong> creates the NLB · <strong>cluster-autoscaler</strong> scales nodes.</p>
+      </div>
+    </details>
+
+    <details><summary><span class="step">3</span> Wire API Gateway to the NLB (phase-2 apply)</summary>
+      <div class="body">
+        <pre><code>NLB=$(kubectl -n ingress-nginx get svc ingress-nginx-controller \
+        -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+terraform apply -var api_backend_url="http://$NLB"</code></pre>
+      </div>
+    </details>
+
+    <details><summary><span class="step">4</span> Deploy the app — via Jenkins</summary>
+      <div class="body">
+        <p>Start the tool-equipped Jenkins host, then run the pipeline.</p>
+        <pre><code>cd ../jenkins
+docker compose up -d --build     # Jenkins + docker/aws/kubectl/kustomize
+# open http://localhost:8080 (no login)
+# New Item -> Pipeline -> "Pipeline script from SCM"
+#   Git URL: file:///workspace/maxweather   Script: jenkins/Jenkinsfile
+# Build with Parameters (ECR_REPO, CLUSTER_NAME, AWS_REGION) -> approve prod</code></pre>
+        <p>The pipeline builds the image, pushes to ECR, deploys to staging, waits for approval, then promotes the same image to prod.</p>
+      </div>
+    </details>
+
+    <details><summary><span class="step">4b</span> Deploy the app — by hand (alternative)</summary>
+      <div class="body">
+        <pre><code>REPO=$(terraform output -raw ecr_repository_url); SHA=$(git rev-parse --short HEAD)
+aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin "$REPO"
+docker build --platform linux/amd64 -t "$REPO:$SHA" ../app
+docker push "$REPO:$SHA"
+( cd ../k8s/overlays/prod &amp;&amp; kustomize edit set image maxweather-app="$REPO:$SHA" )
+kubectl apply -k ../k8s/overlays/prod
+kubectl -n prod rollout status deploy/maxweather</code></pre>
+      </div>
+    </details>
+
+    <details><summary><span class="step">5</span> Verify (Postman / newman)</summary>
+      <div class="body">
+        <pre><code>cd ../terraform
+newman run ../postman/MaxWeather.postman_collection.json \
+  --env-var base_url="$(terraform output -raw api_endpoint)" \
+  --env-var token_url="$(terraform output -raw cognito_token_endpoint)" \
+  --env-var client_id="$(terraform output -raw cognito_client_id)" \
+  --env-var client_secret="$(terraform output -raw cognito_client_secret)" \
+  --env-var scope="$(terraform output -raw cognito_scope)"</code></pre>
+        <p>All three requests pass — including the negative test that a missing token is rejected.</p>
+      </div>
+    </details>
+
+    <details><summary><span class="step">6</span> Tear down (order matters)</summary>
+      <div class="body">
+        <pre><code>kubectl delete svc ingress-nginx-controller -n ingress-nginx   # removes the NLB first
+# delete ECR images (repo must be empty), then:
+cd terraform &amp;&amp; terraform destroy
+cd ../jenkins &amp;&amp; docker compose down</code></pre>
+      </div>
+    </details>
+  </section>
+
+  <section id="repo">
+    <h2>Repo map</h2>
+    <div class="scroll"><table>
+      <tr><th>Path</th><th>Contents</th></tr>
+      <tr><td class="mono">app/</td><td>Flask weather proxy + Dockerfile</td></tr>
+      <tr><td class="mono">terraform/</td><td>Root + 7 modules (vpc, ecr, eks, cognito, lambda-authorizer, api-gateway, cloudwatch)</td></tr>
+      <tr><td class="mono">k8s/</td><td>Kustomize base + overlays + platform manifests</td></tr>
+      <tr><td class="mono">jenkins/</td><td>Jenkinsfile, host image + docker-compose, RUNBOOK, infra pipeline skeleton</td></tr>
+      <tr><td class="mono">postman/</td><td>OAuth2 API collection</td></tr>
+      <tr><td class="mono">docs/</td><td>architecture · naming-and-tagging · configuration · evidence · ADRs · this page</td></tr>
+    </table></div>
+  </section>
+
+  <footer>
+    Built AI-assisted with Claude Code, deliberately and transparently — conventions in <code>CLAUDE.md</code>, decisions in <code>docs/adr/</code>, one commit per phase. This page summarizes the repo; the Markdown docs are the source of truth.
+  </footer>
+
+</main>
+
+<script>
+  (function(){
+    var btn=document.getElementById('themeBtn');
+    var root=document.documentElement;
+    function cur(){
+      var t=root.getAttribute('data-theme');
+      if(t) return t;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light';
+    }
+    btn.addEventListener('click',function(){
+      var next=cur()==='dark'?'light':'dark';
+      root.setAttribute('data-theme',next);
+      try{localStorage.setItem('mw-theme',next);}catch(e){}
+    });
+    try{var saved=localStorage.getItem('mw-theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  })();
+</script>
+</body>
+</html>
