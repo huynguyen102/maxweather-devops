@@ -18,8 +18,7 @@ No secrets are stored in the collection — the variables are empty and filled a
 | `scope` | `terraform output -raw cognito_scope` |
 
 ## Run in Postman
-Import the collection, open **Variables**, paste the values above, then run the
-three requests top to bottom (request 1 sets `access_token` for request 2).
+Import **both** files — `MaxWeather.postman_collection.json` and `MaxWeather.postman_environment.json` — select the environment, fill the values (from the Terraform outputs above), then run the three requests top to bottom (request 1 sets `access_token` for request 2).
 
 ## Run headless with newman
 ```sh
